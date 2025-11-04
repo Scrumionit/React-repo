@@ -2,24 +2,20 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App.tsx";
+import Kyselyt from "./components/Kyselyt.tsx";
+import Kotisivu from "./components/Kotisivu.tsx";
 import "./index.css";
-
-function Home() {
-  return <div>Welcome Home!</div>;
-}
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <App />,
     children: [
-      {
-        index: true,
-        element: <Home />,
-      },
+      { index: true, element: <Kotisivu /> },
+      { path: 'kyselyt', element: <Kyselyt /> },
     ],
   },
-]);
+])
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
