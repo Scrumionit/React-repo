@@ -4,7 +4,7 @@ import type { GridRowParams } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
 import Button from "@mui/material/Button";
 import type { KyselyTyyppi } from "../types";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 export default function Kyselylista() {
   const [kyselyt, setKyselyt] = useState<KyselyTyyppi[]>([]);
@@ -58,18 +58,13 @@ export default function Kyselylista() {
 
   return (
     <>
-      <div style={{ height: 600, width: "fit-content", margin: "auto" }}>
-        <DataGrid rows={kyselyt} columns={sarakkeet} />
-        <Button
-          key="open"
-          variant="contained"
-          size="small"
-          component={Link}
-          to={`/uusikysely`} // ✅ dynamic route
-        >
-          Uusi kysely
+      <div style={{ height: 600, width: "70%", margin: "auto", textAlign: "center" }}>
+
+         <Button component={NavLink} to="/uusikysely" variant="contained" sx={{ backgroundColor: "#18b89e", marginBottom: 3 }}>
+          Luo uusi kysely
         </Button>
-        ,
+
+        <DataGrid rows={kyselyt} columns={sarakkeet} />
       </div>
     </>
   );
