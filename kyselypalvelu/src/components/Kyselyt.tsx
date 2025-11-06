@@ -65,7 +65,7 @@ export default function Kyselylista() {
           variant="contained"
           size="small"
           component={Link}
-          to={`/kysely`} // ✅ dynamic route
+          to={`/uusikysely`} // ✅ dynamic route
         >
           Uusi kysely
         </Button>
