@@ -5,9 +5,10 @@ import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
-import { Box } from '@mui/material'
+import { Box, Button } from '@mui/material'
 import type { KyselyTyyppi } from './types'
-import "./App.css"
+import HHlogo from './assets/HHlogo.png'
+// import "./App.css"
 
 
 function App() {
@@ -17,14 +18,56 @@ function App() {
   return (
     <Container maxWidth="xl">
       <CssBaseline />
-      <AppBar position="static">
+
+      <AppBar sx={{
+        position: "static", background: "linear-gradient(90deg, #0079c2 0%, #18b89e 100%)",
+        boxShadow: 3,
+        borderRadius: 2,
+        marginBottom: 4,
+        marginTop: 1.5,
+      }}>
+
         <Toolbar>
-          <Typography variant="h6">Kyselypalvelu</Typography>
+          <Button component={NavLink} to="/">
+            <img
+              src={HHlogo}
+              alt="Haaga-Helia logo"
+              style={{ height: 70, padding: 8, marginRight: 10 }}
+            />
+          </Button>
+
+          <Typography variant="h6" sx={{position: "absolute", left: "50%", transform: "translateX(-50%)", fontWeight: "bold"}}>Haaga-Helian Kyselypalvelu</Typography>
+
           <Box sx={{ flexGrow: 1 }} />
           <nav>
-            <NavLink style={({ isActive }) => ({ fontSize: '95%', margin: '20px', color: isActive ? "darkblue" : "white" })} to={"/"}>KOTI</NavLink>
-            <NavLink style={({ isActive }) => ({ fontSize: '95%', margin: '20px', color: isActive ? "darkblue" : "white" })} to={"/kyselyt"}>KYSELYT</NavLink>
+            <Button component={NavLink} to="/"
+              sx={{
+                color: "white",
+                fontSize: "105%",
+                "&.active": {
+                  color: "#0166a5ff",
+                },
+                "&:hover": {
+                  color: "#005565ff",
+                },
+              }}
+            >KOTI</Button>
+
+            <Button component={NavLink} to="/kyselyt"
+              sx={{
+                color: "white",
+                fontSize: "105%",
+                marginLeft: 1,
+                "&.active": {
+                  color: "#0166a5ff",
+                },
+                "&:hover": {
+                  color: "#005565ff",
+                },
+              }}
+            >KYSELYT</Button>
           </nav>
+
         </Toolbar>
       </AppBar>
       <Outlet context={{ kyselyt, setKyselyt, kysely, setKysely }} />

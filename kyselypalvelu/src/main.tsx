@@ -5,7 +5,7 @@ import App from "./App.tsx";
 import Kyselyt from "./components/Kyselyt.tsx";
 import Kysely from "./components/Kysely.tsx";
 import Kotisivu from "./components/Kotisivu.tsx";
-import "./index.css";
+// import "./index.css";
 
 const router = createBrowserRouter([
   {
