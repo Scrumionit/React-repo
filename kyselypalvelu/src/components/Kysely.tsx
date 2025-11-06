@@ -25,32 +25,37 @@ export default function UusiKysely() {
     };
 
     return (
-        <div style={{ textAlign: "center" }}>
+        <div style={{
+          width: "50%",
+          margin: "auto",
+          paddingTop: 20,
+          display: "flex",
+          flexDirection: "column",
+          gap: 10
+        }}>
             <h2>Kyselyn Nimi</h2>
-            <br />
             <h3>Kyselyn kuvaus</h3>
             <br />
 
-            <p><b>Kysymysteksti 1</b></p>
+            <p><b>Kysymys 1:</b></p>
             <TextField
                 id="outlined-multiline-static"
                 label="Anna vastaus"
                 multiline
                 rows={3}
-                sx={{ width: "40%" }}
             />
 
-            <p><b>Kysymysteksti 2</b></p>
+            <p><b>Kysymys 2:</b></p>
             <TextField
                 id="outlined-multiline-static"
                 label="Anna vastaus"
                 multiline
                 rows={3}
-                sx={{ width: "40%" }}
             />
 
+            
             <br />
-            <Button component={NavLink} to="/kyselyt" variant="contained" sx={{ backgroundColor: "#18b89e", marginTop: 6}}>
+            <Button component={NavLink} to="/kyselyt" variant="contained" sx={{ backgroundColor: "#18b89e", marginTop: 2}}>
                 Tallenna vastaukset
             </Button>
 

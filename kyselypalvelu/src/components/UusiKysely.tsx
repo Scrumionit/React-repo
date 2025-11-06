@@ -7,6 +7,7 @@ import {
   TextField,
   Button,
 } from "@mui/material";
+import { NavLink } from "react-router-dom";
 
 export default function UusiKysely() {
   const [kysymykset, setKysymykset] = useState([""]);
@@ -45,7 +46,7 @@ export default function UusiKysely() {
             id="kyselyn-tyyppi"
             //value={age}
             label="Age"
-            //onChange={handleChange}
+          //onChange={handleChange}
           >
             <MenuItem value={"avoin"}>Avoin</MenuItem>
             <MenuItem value={"monivalinta"}>Monivalinta</MenuItem>
@@ -67,11 +68,20 @@ export default function UusiKysely() {
         ))}
         <Button
           variant="contained"
-          sx={{ backgroundColor: "#18b89e", marginTop: 4 }}
+          sx={{ backgroundColor: "#189bb8ff", marginTop: 4 }}
           onClick={handleLisaaKysymys}
         >
           Lisää kysymys
         </Button>
+
+        <br />
+        <Button component={NavLink} to="/kyselyt"
+          variant="contained"
+          sx={{ backgroundColor: "#18b89e", marginTop: 2 }}
+        >
+          Tallenna kysely
+        </Button>
+
       </div>
     </>
   );

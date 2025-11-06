@@ -71,7 +71,7 @@ export default function Kyselylista() {
             component={Link}
             to={`/kysely}/${params.id}`}
             variant="contained"
-            sx={{ backgroundColor: "#0079c2", marginRight: 1 }}
+            sx={{ backgroundColor: "#189bb8ff", marginRight: 1 }}
           >
             Avaa
           </Button>
