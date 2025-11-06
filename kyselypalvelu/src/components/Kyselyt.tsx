@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
-import type { GridRowParams } from "@mui/x-data-grid";
-import type { GridColDef } from "@mui/x-data-grid";
+import { DataGrid } from "@mui/x-data-grid";
+import type { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import Button from "@mui/material/Button";
 import type { KyselyTyyppi } from "../types";
 import { Link, NavLink } from "react-router-dom";
@@ -29,30 +28,55 @@ export default function Kyselylista() {
 
   const sarakkeet: GridColDef[] = [
     {
-      field: "otsikko",
-      headerName: "Otsikko",
+      field: "nimi",
+      headerName: "Nimi",
+      minWidth: 150,
+      flex: 1,
     },
 
     {
       field: "kuvaus",
       headerName: "Kuvaus",
+      minWidth: 200,
+      flex: 2,
     },
 
     {
-      field: "alkuaika",
+      field: "alkupvm",
+      type: "date",
       headerName: "Alkamisajankohta",
+      minWidth: 150,
+      flex: 1,
     },
 
     {
-      field: "loppuaika",
+      field: "loppupvm",
+      type: "date",
       headerName: "Päättymisajankohta",
+      minWidth: 150,
+      flex: 1,
     },
 
     {
-      field: "actions",
-      type: "actions",
-      headerName: "Muokkaa ",
-      getActions: (params: GridRowParams) => [],
+      field: "_links.self.href",
+      headerName: "",
+      minWidth: 150,
+      flex: 1,
+      sortable: false,
+      filterable: false,
+      hideable: false,
+      renderCell: (params: GridRenderCellParams) => (
+        <>
+          <Button
+            component={Link}
+            to={`/kysely}/${params.id}`}
+            variant="contained"
+            sx={{ backgroundColor: "#0079c2", marginRight: 1 }}
+          >
+            Avaa
+          </Button>
+        </>
+      ),
     },
   ];
 
@@ -60,11 +84,19 @@ export default function Kyselylista() {
     <>
       <div style={{ height: 600, width: "70%", margin: "auto", textAlign: "center" }}>
 
-         <Button component={NavLink} to="/uusikysely" variant="contained" sx={{ backgroundColor: "#18b89e", marginBottom: 3 }}>
+        <Button component={NavLink} to="/uusikysely" variant="contained" sx={{ backgroundColor: "#18b89e", marginBottom: 3 }}>
           Luo uusi kysely
         </Button>
 
-        <DataGrid rows={kyselyt} columns={sarakkeet} />
+        <DataGrid rows={kyselyt} columns={sarakkeet} getRowId={row => row._links.self.href} getRowHeight={() => 'auto'}
+          sx={{
+            '& .MuiDataGrid-cell': {
+              whiteSpace: 'normal',
+              wordWrap: 'break-word',
+              lineHeight: '1.4rem',
+              alignItems: 'flex-start',
+            },
+          }} />
       </div>
     </>
   );
