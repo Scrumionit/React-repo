@@ -9,6 +9,8 @@ import {
   IconButton,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ShortTextIcon from "@mui/icons-material/ShortText";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { NavLink } from "react-router-dom";
 
 export default function UusiKysely() {
@@ -86,7 +88,21 @@ export default function UusiKysely() {
         fullWidth
         sx={{ maxWidth: 600 }}
       />
+      <TextField
+        id="alkamisajankohta"
+        label="Alkamisajankohta"
+        type="datetime-local"
+        InputLabelProps={{ shrink: true }}
+        fullWidth
+      />
 
+      <TextField
+        id="paattymisajankohta"
+        label="Päättymisajankohta"
+        type="datetime-local"
+        InputLabelProps={{ shrink: true }}
+        fullWidth
+      />
       {kysymykset.map((k, index) => (
         <div
           key={index}
@@ -117,8 +133,19 @@ export default function UusiKysely() {
                 muutaKysymysTyyppi(index, e.target.value as string)
               }
             >
-              <MenuItem value={"avoin"}>Avoin</MenuItem>
-              <MenuItem value={"monivalinta"}>Monivalinta</MenuItem>
+              <MenuItem value={"avoin"}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <ShortTextIcon fontSize="small" />
+                  Avoin
+                </div>
+              </MenuItem>
+
+              <MenuItem value={"monivalinta"}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <FormatListBulletedIcon fontSize="small" />
+                  Monivalinta
+                </div>
+              </MenuItem>
             </Select>
           </FormControl>
 
@@ -151,7 +178,7 @@ export default function UusiKysely() {
                     onClick={() => poistaVaihtoehto(index, oi)}
                     size="small"
                   >
-                    <DeleteIcon />
+                    <DeleteIcon sx={{ color: "red" }} />
                   </IconButton>
                 </div>
               ))}
