@@ -13,7 +13,7 @@ export default function Kyselylista() {
   }, []);
 
   const fetchKyselyt = () => {
-    fetch("http://127.0.0.1:8080/api") // selvitetään backendistä kun valmis
+    fetch("http://127.0.0.1:8080/api/kyselyt")
       .then((vastaus) => {
         if (!vastaus.ok) {
           throw new Error("Virhe hakiessa kyselyjä: " + vastaus.statusText);
@@ -21,7 +21,7 @@ export default function Kyselylista() {
         return vastaus.json();
       })
       .then((data) => {
-        setKyselyt(data._embedded.kyselyt); // selvitetään backendistä kun valmis
+        setKyselyt(data); // backend returns a plain list
       })
       .catch((virhe) => console.error(virhe));
   };
@@ -69,7 +69,7 @@ export default function Kyselylista() {
         <>
           <Button
             component={Link}
-            to={`/kysely}/${params.id}`}
+            to={`/kysely/${params.row.kysely_id}`}
             variant="contained"
             sx={{ backgroundColor: "#189bb8ff", marginRight: 1 }}
           >
@@ -88,7 +88,7 @@ export default function Kyselylista() {
           Luo uusi kysely
         </Button>
 
-        <DataGrid rows={kyselyt} columns={sarakkeet} getRowId={row => row._links.self.href} getRowHeight={() => 'auto'}
+        <DataGrid rows={kyselyt} columns={sarakkeet} getRowId={(row) => row.kysely_id} getRowHeight={() => 'auto'}
           sx={{
             '& .MuiDataGrid-cell': {
               whiteSpace: 'normal',
