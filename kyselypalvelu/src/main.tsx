@@ -16,7 +16,7 @@ const router = createBrowserRouter([
       { index: true, element: <Kotisivu /> },
       { path: "kyselyt", element: <Kyselyt /> },
       {
-        path: "kysely", // <-- dynamic route for single Kysely(kyselyt/:id)
+        path: "kyselyt/:id",
         element: <Kysely />,
       },
       {

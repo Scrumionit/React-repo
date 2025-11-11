@@ -55,20 +55,24 @@ export default function UusiKysely() {
             <h2>{kysely.nimi}</h2>
             <h3>{kysely.kuvaus}</h3>
 
-            {kysely.kysymykset.map((k, index) => (
-                <div key={k.kysymys_id}>
-                    <p>
-                        <b>Kysymys {index + 1}:</b> {k.kysymysteksti}
-                    </p>
-                    <TextField
-                        label="Anna vastaus"
-                        multiline
-                        rows={3}
-                        variant="outlined"
-                        fullWidth
-                    />
-                </div>
-            ))}
+            {kysely.kysymykset && kysely.kysymykset.length > 0 ? (
+                kysely.kysymykset.map((k, index) => (
+                    <div key={k.kysymys_id}>
+                        <p>
+                            <b>Kysymys {index + 1}:</b> {k.kysymysteksti}
+                        </p>
+                        <TextField
+                            label="Anna vastaus"
+                            multiline
+                            rows={3}
+                            variant="outlined"
+                            fullWidth
+                        />
+                    </div>
+                ))
+            ) : (
+                <p><i>Ei kysymyksiä tässä kyselyssä.</i></p>
+            )}
 
             <br />
             <Button component={NavLink} to="/kyselyt" variant="contained" sx={{ backgroundColor: "#18b89e", marginTop: 2 }}>

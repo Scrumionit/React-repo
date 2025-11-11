@@ -68,7 +68,7 @@ export default function Kyselylista() {
         <>
           <Button
             component={Link}
-            to={`/kysely/${params.row.kysely_id}`}
+            to={`/kyselyt/${params.row.kysely_id}`}
             variant="contained"
             sx={{ backgroundColor: "#189bb8ff", marginLeft: 1, marginRight: 1 }}
           >
