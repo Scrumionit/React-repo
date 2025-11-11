@@ -30,20 +30,19 @@ export default function Kyselylista() {
     {
       field: "nimi",
       headerName: "Nimi",
-      minWidth: 150,
+      minWidth: 220,
       flex: 1,
     },
 
     {
       field: "kuvaus",
       headerName: "Kuvaus",
-      minWidth: 200,
+      minWidth: 250,
       flex: 2,
     },
 
     {
       field: "alkupvm",
-      type: "date",
       headerName: "Alkamisajankohta",
       minWidth: 150,
       flex: 1,
@@ -51,7 +50,6 @@ export default function Kyselylista() {
 
     {
       field: "loppupvm",
-      type: "date",
       headerName: "Päättymisajankohta",
       minWidth: 150,
       flex: 1,
@@ -65,13 +63,14 @@ export default function Kyselylista() {
       sortable: false,
       filterable: false,
       hideable: false,
+      align: "center",
       renderCell: (params: GridRenderCellParams) => (
         <>
           <Button
             component={Link}
             to={`/kysely/${params.row.kysely_id}`}
             variant="contained"
-            sx={{ backgroundColor: "#189bb8ff", marginRight: 1 }}
+            sx={{ backgroundColor: "#189bb8ff", marginLeft: 1, marginRight: 1 }}
           >
             Avaa
           </Button>
@@ -95,6 +94,7 @@ export default function Kyselylista() {
               wordWrap: 'break-word',
               lineHeight: '1.4rem',
               alignItems: 'flex-start',
+              padding: '12px 14px',
             },
           }} />
       </div>
