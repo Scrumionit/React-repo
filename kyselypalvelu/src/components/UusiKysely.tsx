@@ -11,6 +11,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import ShortTextIcon from "@mui/icons-material/ShortText";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { NavLink } from "react-router-dom";
 
 export default function UusiKysely() {
@@ -76,6 +77,20 @@ export default function UusiKysely() {
         gap: 20,
       }}
     >
+      <IconButton
+        component={NavLink}
+        to="/kyselyt"
+        sx={{
+          backgroundColor: "#189bb8ff",
+          color: "white",
+          width: 45,
+          height: 45,
+          "&:hover": { backgroundColor: "#147a99" },
+        }}
+      >
+        <ArrowBackIcon />
+      </IconButton>
+
       <h2>Uusi kysely</h2>
 
       <TextField id="otsikko" label="Otsikko" />

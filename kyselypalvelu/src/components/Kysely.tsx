@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import type { KyselyTyyppi } from "../types";
-import { Button, TextField } from "@mui/material";
+import { Button, IconButton, TextField } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { NavLink } from "react-router";
 import { useParams } from "react-router-dom";
 
@@ -53,10 +54,19 @@ export default function UusiKysely() {
             flexDirection: "column",
             gap: 10
         }}>
-            <Button
-                component={NavLink} to="/kyselyt" variant="contained" sx={{ backgroundColor: "#189bb8ff", width: "20%" }} >
-                Takaisin
-            </Button>
+            <IconButton
+                component={NavLink}
+                to="/kyselyt"
+                sx={{
+                    backgroundColor: "#189bb8ff",
+                    color: "white",
+                    width: 45,
+                    height: 45,
+                    "&:hover": { backgroundColor: "#147a99" },
+                }}
+            >
+                <ArrowBackIcon />
+            </IconButton>
 
             <h2>{kysely.nimi}</h2>
             <h3>{kysely.kuvaus}</h3>
