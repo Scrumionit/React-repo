@@ -35,7 +35,7 @@ export default function UusiKysely() {
             <div style={{
                 width: "50%",
                 margin: "auto",
-                paddingTop: 20,
+                paddingTop: 10,
                 display: "flex",
                 flexDirection: "column",
                 gap: 10

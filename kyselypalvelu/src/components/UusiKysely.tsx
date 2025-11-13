@@ -71,7 +71,7 @@ export default function UusiKysely() {
       style={{
         width: "40vw",
         margin: "auto",
-        paddingTop: 20,
+        paddingTop: 10,
         display: "flex",
         flexDirection: "column",
         gap: 20,
@@ -221,7 +221,7 @@ export default function UusiKysely() {
         component={NavLink}
         to="/kyselyt"
         variant="contained"
-        sx={{ backgroundColor: "#18b89e", marginTop: 3 }}
+        sx={{ backgroundColor: "#18b89e", marginTop: 3, marginBottom: 5 }}
       >
         Tallenna kysely
       </Button>
