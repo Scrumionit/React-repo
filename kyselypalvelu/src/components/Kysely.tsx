@@ -15,7 +15,8 @@ export default function UusiKysely() {
     }, [id]);
 
     const fetchKysely = (id: string) => {
-        fetch(`http://127.0.0.1:8080/api/kyselyt/${id}`)
+        // fetch(`http://127.0.0.1:8080/api/kyselyt/${id}`) lokaalisti testatessa
+        fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}`) // rahtiversio
             .then((vastaus) => {
                 if (!vastaus.ok) {
                     throw new Error("Virhe hakiessa kyselyä: " + vastaus.statusText);

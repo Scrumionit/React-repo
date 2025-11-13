@@ -13,7 +13,8 @@ export default function Kyselylista() {
   }, []);
 
   const fetchKyselyt = () => {
-    fetch("http://127.0.0.1:8080/api/kyselyt")
+    // fetch("http://127.0.0.1:8080/api/kyselyt")  paikallinen testi
+    fetch("https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt") // rahtiversio
       .then((vastaus) => {
         if (!vastaus.ok) {
           throw new Error("Virhe hakiessa kyselyjä: " + vastaus.statusText);
