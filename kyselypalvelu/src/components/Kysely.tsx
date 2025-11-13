@@ -2,16 +2,21 @@ import { useState, useEffect } from "react";
 import type { KyselyTyyppi } from "../types";
 import { Button, TextField } from "@mui/material";
 import { NavLink } from "react-router";
+import { useParams } from "react-router-dom";
 
 export default function UusiKysely() {
-    const [kysely, setKysely] = useState<KyselyTyyppi[]>([]);
+    const { id } = useParams<{ id: string }>();
+    const [kysely, setKysely] = useState<KyselyTyyppi | null>(null);
 
     useEffect(() => {
-        fetchKysely();
-    }, []);
+        if (id) {
+            fetchKysely(id);
+        }
+    }, [id]);
 
-    const fetchKysely = () => {
-        fetch("http://127.0.0.1:8080/api/kysely/id") // selvitetään backendistä kun valmis
+    const fetchKysely = (id: string) => {
+        // fetch(`http://127.0.0.1:8080/api/kyselyt/${id}`) lokaalisti testatessa
+        fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}`) // rahtiversio
             .then((vastaus) => {
                 if (!vastaus.ok) {
                     throw new Error("Virhe hakiessa kyselyä: " + vastaus.statusText);
@@ -19,43 +24,64 @@ export default function UusiKysely() {
                 return vastaus.json();
             })
             .then((data) => {
-                setKysely(data._embedded.kysely); // selvitetään backendistä kun valmis
+                setKysely(data);
             })
             .catch((virhe) => console.error(virhe));
     };
 
+    if (!kysely) {
+        return (
+            <div style={{
+                width: "50%",
+                margin: "auto",
+                paddingTop: 20,
+                display: "flex",
+                flexDirection: "column",
+                gap: 10
+            }}>
+                <h2>Ladataan...</h2>
+            </div>
+        );
+    }
+
     return (
         <div style={{
-          width: "50%",
-          margin: "auto",
-          paddingTop: 20,
-          display: "flex",
-          flexDirection: "column",
-          gap: 10
+            width: "50%",
+            margin: "auto",
+            paddingTop: 20,
+            display: "flex",
+            flexDirection: "column",
+            gap: 10
         }}>
-            <h2>Kyselyn Nimi</h2>
-            <h3>Kyselyn kuvaus</h3>
+            <Button
+                component={NavLink} to="/kyselyt" variant="contained" sx={{ backgroundColor: "#189bb8ff", width: "20%" }} >
+                Takaisin
+            </Button>
+
+            <h2>{kysely.nimi}</h2>
+            <h3>{kysely.kuvaus}</h3>
+
+            {kysely.kysymykset && kysely.kysymykset.length > 0 ? (
+                kysely.kysymykset.map((k, index) => (
+                    <div key={k.kysymys_id}>
+                        <p>
+                            <b>Kysymys {index + 1}:</b> {k.kysymysteksti}
+                        </p>
+                        <TextField
+                            label="Anna vastaus"
+                            multiline
+                            rows={3}
+                            variant="outlined"
+                            fullWidth
+                        />
+                    </div>
+                ))
+            ) : (
+                <p><i>Ei kysymyksiä tässä kyselyssä.</i></p>
+            )}
+
             <br />
-
-            <p><b>Kysymys 1:</b></p>
-            <TextField
-                id="outlined-multiline-static"
-                label="Anna vastaus"
-                multiline
-                rows={3}
-            />
-
-            <p><b>Kysymys 2:</b></p>
-            <TextField
-                id="outlined-multiline-static"
-                label="Anna vastaus"
-                multiline
-                rows={3}
-            />
-
-            
-            <br />
-            <Button component={NavLink} to="/kyselyt" variant="contained" sx={{ backgroundColor: "#18b89e", marginTop: 2}}>
+            <Button component={NavLink} to="/kyselyt" variant="contained" sx={{ backgroundColor: "#18b89e", marginTop: 2 }}>
                 Tallenna vastaukset
             </Button>
 
