@@ -179,7 +179,7 @@ export default function UusiKysely() {
         component={NavLink}
         to="/kyselyt"
         variant="contained"
-        sx={{ backgroundColor: "#18b89e" }}
+        sx={{ backgroundColor: "#18b89e", marginTop: 3 }}
       >
         Tallenna kysely
       </Button>

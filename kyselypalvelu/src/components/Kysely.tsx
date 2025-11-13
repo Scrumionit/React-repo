@@ -52,6 +52,11 @@ export default function UusiKysely() {
             flexDirection: "column",
             gap: 10
         }}>
+            <Button
+                component={NavLink} to="/kyselyt" variant="contained" sx={{ backgroundColor: "#189bb8ff", width: "20%" }} >
+                Takaisin
+            </Button>
+
             <h2>{kysely.nimi}</h2>
             <h3>{kysely.kuvaus}</h3>
 
