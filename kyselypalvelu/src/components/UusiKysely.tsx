@@ -12,12 +12,17 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ShortTextIcon from "@mui/icons-material/ShortText";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 export default function UusiKysely() {
   const [kysymykset, setKysymykset] = useState([
     { kysymys: "", tyyppi: "", vaihtoehdot: [""] },
   ]);
+  const [nimi, setNimi] = useState("");
+  const [kuvaus, setKuvaus] = useState("");
+  const [alkamisajankohta, setAlkamisajankohta] = useState("");
+  const [paattymisajankohta, setPaattymisajankohta] = useState("");
+  const navigate = useNavigate();
 
   const lisaaKysymys = () => {
     setKysymykset((prev) => [
@@ -93,7 +98,7 @@ export default function UusiKysely() {
 
       <h2>Uusi kysely</h2>
 
-      <TextField id="otsikko" label="Otsikko" />
+      <TextField id="otsikko" label="Otsikko" value={nimi} onChange={(e) => setNimi(e.target.value)} />
 
       <TextField
         id="kuvaus"
@@ -102,21 +107,27 @@ export default function UusiKysely() {
         rows={6}
         fullWidth
         sx={{ maxWidth: 600 }}
+        value={kuvaus}
+        onChange={(e) => setKuvaus(e.target.value)}
       />
       <TextField
         id="alkamisajankohta"
         label="Alkamisajankohta"
-        type="datetime-local"
+        type="date"
         InputLabelProps={{ shrink: true }}
         fullWidth
+        value={alkamisajankohta}
+        onChange={(e) => setAlkamisajankohta(e.target.value)}
       />
 
       <TextField
         id="paattymisajankohta"
         label="Päättymisajankohta"
-        type="datetime-local"
+        type="date"
         InputLabelProps={{ shrink: true }}
         fullWidth
+        value={paattymisajankohta}
+        onChange={(e) => setPaattymisajankohta(e.target.value)}
       />
       {kysymykset.map((k, index) => (
         <div
@@ -217,11 +228,56 @@ export default function UusiKysely() {
         Lisää kysymys
       </Button>
 
-      <Button
-        component={NavLink}
-        to="/kyselyt"
+      <Button // kokeiltu uuden kyselyn luomista frontendin kautta ja pitäisi toimia, vaihtoehdot ei kuitenkaan tallennu (muut kuin avoimet kysymykset ei vielä käsitelty))
         variant="contained"
         sx={{ backgroundColor: "#18b89e", marginTop: 3, marginBottom: 5 }}
+        onClick={async () => {
+          // Build payload
+          const payload = {
+            nimi,
+            kuvaus,
+            alkupvm: alkamisajankohta,
+            loppupvm: paattymisajankohta,
+            kysymykset: kysymykset.map((k) => ({
+              kysymystyyppi: k.tyyppi,
+              kysymysteksti: k.kysymys,
+              vaihtoehdot: k.vaihtoehdot && k.vaihtoehdot.length ? k.vaihtoehdot : [],
+            })),
+          };
+
+          try {
+            const response = await fetch("http://127.0.0.1:8080/api/kyselyt", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            if (!response.ok) throw new Error(`Palvelin palautti virheen: ${response.status}`);
+            const saved = await response.json();
+
+            // If there are questions, POST them sequentially to preserve the order
+            if (kysymykset && kysymykset.length > 0) {
+              for (const k of kysymykset) {
+                const kysPayload = {
+                  kysymystyyppi: k.tyyppi,
+                  kysymysteksti: k.kysymys,
+                  vaihtoehdot: k.vaihtoehdot && k.vaihtoehdot.length ? k.vaihtoehdot : [],
+                };
+                const response = await fetch(`http://127.0.0.1:8080/api/kyselyt/${saved.kysely_id}/kysymykset`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(kysPayload),
+                });
+                if (!response.ok) throw new Error(`Kysymysten tallennus epäonnistui: ${response.status}`);
+              }
+            }
+
+            alert("Kysely ja kysymykset tallennettu");
+            navigate("/kyselyt");
+          } catch (err) {
+            console.error(err);
+            alert("Kyselyn tallennus epäonnistui. Katso konsoli.");
+          }
+        }}
       >
         Tallenna kysely
       </Button>

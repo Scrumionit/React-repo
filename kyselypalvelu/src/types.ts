@@ -2,7 +2,7 @@ export type KysymysTyyppi = {
   kysymys_id: number;
   kysymystyyppi: string;
   kysymysteksti: string;
-  vastaus: string[]; // element collection in backend is a list of strings
+  vastaus: string[];
 };
 
 export type KyselyTyyppi = {

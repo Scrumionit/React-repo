@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import type { KyselyTyyppi } from "../types";
 import { Button, IconButton, TextField } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 
 export default function UusiKysely() {
     const { id } = useParams<{ id: string }>();
     const [kysely, setKysely] = useState<KyselyTyyppi | null>(null);
+    const [vastaukset, setVastaukset] = useState<Record<number, string>>({});
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (id) {
@@ -16,8 +18,8 @@ export default function UusiKysely() {
     }, [id]);
 
     const fetchKysely = (id: string) => {
-        // fetch(`http://127.0.0.1:8080/api/kyselyt/${id}`) lokaalisti testatessa
-        fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}`) // rahtiversio
+        fetch(`http://127.0.0.1:8080/api/kyselyt/${id}`) // lokaalisti testatessa
+        // fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}`) // rahtiversio
             .then((vastaus) => {
                 if (!vastaus.ok) {
                     throw new Error("Virhe hakiessa kyselyä: " + vastaus.statusText);
@@ -38,9 +40,10 @@ export default function UusiKysely() {
                 paddingTop: 10,
                 display: "flex",
                 flexDirection: "column",
-                gap: 10
+                gap: 10,
             }}>
-                <h2>Ladataan...</h2>
+                <h2>Hups!</h2>
+                <p>Kyselyä ei valitettavasti löytynyt. <a href="/kyselyt">Palaa listaukseen</a>.</p>
             </div>
         );
     }
@@ -83,6 +86,13 @@ export default function UusiKysely() {
                             rows={3}
                             variant="outlined"
                             fullWidth
+                            value={vastaukset[k.kysymys_id] ?? ""}
+                            onChange={(e) =>
+                                setVastaukset((prev) => ({
+                                    ...prev,
+                                    [k.kysymys_id]: e.target.value,
+                                }))
+                            }
                         />
                     </div>
                 ))
@@ -91,7 +101,30 @@ export default function UusiKysely() {
             )}
 
             <br />
-            <Button component={NavLink} to="/kyselyt" variant="contained" sx={{ backgroundColor: "#18b89e", marginTop: 2 }}>
+            <Button onClick={async () => {  // kokeiltu tallennusta mutta ei toimi vielä
+                if (!kysely) return;
+                const payload = {
+                    kysely_id: kysely.kysely_id,
+                    vastaukset: kysely.kysymykset.map((k) => ({
+                        kysymys_id: k.kysymys_id,
+                        vastausteksti: vastaukset[k.kysymys_id] ?? ""
+                    }))
+                };
+
+                try {
+                    const resp = await fetch("http://127.0.0.1:8080/api/vastaukset", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload),
+                    });
+                    if (!resp.ok) throw new Error(`Palvelin palautti virheen: ${resp.status}`);
+                    alert("Vastaukset tallennettu.");
+                    navigate("/kyselyt");
+                } catch (err) {
+                    console.error(err);
+                    alert("Vastauksien tallennus epäonnistui. Katso konsoli.");
+                }
+            }} variant="contained" sx={{ backgroundColor: "#18b89e", marginTop: 2, marginBottom: 5 }}>
                 Tallenna vastaukset
             </Button>
 
