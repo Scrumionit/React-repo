@@ -57,9 +57,9 @@ export default function Kyselylista() {
     },
 
     {
-      field: "_links.self.href",
+      field: "vastaa",
       headerName: "",
-      minWidth: 150,
+      minWidth: 190,
       flex: 1,
       sortable: false,
       filterable: false,
@@ -71,9 +71,34 @@ export default function Kyselylista() {
             component={Link}
             to={`/kyselyt/${params.row.kysely_id}`}
             variant="contained"
+            size="small"
             sx={{ backgroundColor: "#189bb8ff", marginLeft: 1, marginRight: 1 }}
           >
-            Avaa
+            Vastaa kyselyyn
+          </Button>
+        </>
+      ),
+    },
+
+    {
+      field: "tulosraportti",
+      headerName: "",
+      minWidth: 190,
+      flex: 1,
+      sortable: false,
+      filterable: false,
+      hideable: false,
+      align: "center",
+      renderCell: (params: GridRenderCellParams) => (
+        <>
+          <Button
+            component={Link}
+            to={`/tulosraportti/${params.row.kysely_id}`}
+            variant="contained"
+            size="small"
+            sx={{ backgroundColor: "#189bb8ff", marginLeft: 1, marginRight: 1}}
+          >
+            Avaa raportti
           </Button>
         </>
       ),
@@ -82,13 +107,13 @@ export default function Kyselylista() {
 
   return (
     <>
-      <div style={{ height: 600, width: "70%", margin: "auto", textAlign: "center" }}>
+      <div style={{ height: 600, width: "85%", margin: "auto", textAlign: "center" }}>
 
         <Button component={NavLink} to="/uusikysely" variant="contained" sx={{ backgroundColor: "#18b89e", marginBottom: 3 }}>
           Luo uusi kysely
         </Button>
 
-        <DataGrid rows={kyselyt} columns={sarakkeet} getRowId={(row) => row.kysely_id} getRowHeight={() => 'auto'}
+        <DataGrid rows={kyselyt} columns={sarakkeet} getRowId={(row) => row.kysely_id} getRowHeight={() => 'auto'} rowSelection={false}
           sx={{
             '& .MuiDataGrid-cell': {
               whiteSpace: 'normal',

@@ -11,3 +11,9 @@ export type KyselyTyyppi = {
   kuvaus: string;
   kysymykset: KysymysTyyppi[];
 };
+
+export type VastausTyyppi = {
+  vastaus_id: number;
+  vastausteksti: string;
+  kysymys_id: number;
+};
