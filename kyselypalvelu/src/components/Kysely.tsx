@@ -12,6 +12,7 @@ export default function UusiKysely() {
     const [saving, setSaving] = useState(false);
     const [saveError, setSaveError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const [kyselyLoading, setKyselyLoading] = useState(true);
 
     useEffect(() => {
         if (id) {
@@ -20,6 +21,7 @@ export default function UusiKysely() {
     }, [id]);
 
     const fetchKysely = (id: string) => {
+        setKyselyLoading(true);
         fetch(`http://127.0.0.1:8080/api/kyselyt/${id}`) // lokaalisti testatessa
         // fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}`) // rahtiversio
             .then((vastaus) => {
@@ -31,8 +33,17 @@ export default function UusiKysely() {
             .then((data) => {
                 setKysely(data);
             })
-            .catch((virhe) => console.error(virhe));
+            .catch((virhe) => console.error(virhe))
+            .finally(() => setKyselyLoading(false));
     };
+
+  if (kyselyLoading) {
+        return (
+            <div style={{ width: "50%", margin: "auto", paddingTop: 20, textAlign: "center" }}>
+                <h3>Ladataan kyselyä…</h3>
+            </div>
+        );
+    }
 
     if (!kysely) {
         return (

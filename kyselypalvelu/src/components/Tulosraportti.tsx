@@ -68,7 +68,7 @@ export default function Tulosraportti() {
 
     if (kyselyLoading) {
         return (
-            <div style={{ width: "85%", margin: "auto", paddingTop: 20, textAlign: "center" }}>
+            <div style={{ width: "50%", margin: "auto", paddingTop: 20, textAlign: "center" }}>
                 <h3>Ladataan kyselyä…</h3>
             </div>
         );
@@ -77,7 +77,7 @@ export default function Tulosraportti() {
     if (!kysely) {
         return (
             <div style={{
-                width: "85%",
+                width: "50%",
                 margin: "auto",
                 paddingTop: 10,
                 display: "flex",
@@ -92,7 +92,7 @@ export default function Tulosraportti() {
 
     return (
         <div style={{
-            width: "85%",
+            width: "70%",
             margin: "auto",
             paddingTop: 20,
             display: "flex",
@@ -113,7 +113,7 @@ export default function Tulosraportti() {
                 <ArrowBackIcon />
             </IconButton>
 
-            <h2>Kyselyn <b>{kysely.nimi}</b> tulosraportti</h2>
+            <h2>Kyselyn "<b>{kysely.nimi}</b>" tulosraportti</h2>
 
             {kyselyError && <div style={{ color: "#b00020" }}>Kyselyn latauksessa virhe: {kyselyError}</div>}
             {vastauksetError && <div style={{ color: "#b00020" }}>Vastauksia ei voitu ladata: {vastauksetError}</div>}
@@ -145,7 +145,7 @@ export default function Tulosraportti() {
                 <p>Kyselyssä ei ole kysymyksiä.</p>
             )}
 
-            <Button component={NavLink} to="/kyselyt" variant="contained" sx={{ backgroundColor: "#18b89e", marginBottom: 3 }}>
+            <Button component={NavLink} to="/kyselyt" variant="contained" sx={{ backgroundColor: "#18b89e", marginTop: 3, marginBottom: 4 }}>
                 Palaa kyselyihin
             </Button>
         </div>
