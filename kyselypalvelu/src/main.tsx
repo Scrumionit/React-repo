@@ -6,6 +6,7 @@ import Kyselyt from "./components/Kyselyt.tsx";
 import Kysely from "./components/Kysely.tsx";
 import Kotisivu from "./components/Kotisivu.tsx";
 import UusiKysely from "./components/UusiKysely.tsx";
+import Tulosraportti from "./components/Tulosraportti.tsx";
 // import "./index.css";
 
 const router = createBrowserRouter([
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
         path: "kyselyt/:id",
         element: <Kysely />,
       },
+        {
+          path: "tulosraportti/:id",
+          element: <Tulosraportti />,
+        },
       {
         path: "uusikysely",
         element: <UusiKysely />,

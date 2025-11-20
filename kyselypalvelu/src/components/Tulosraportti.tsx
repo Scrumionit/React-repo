@@ -8,6 +8,10 @@ export default function Tulosraportti() {
     const { id } = useParams<{ id: string }>();
     const [kysely, setKysely] = useState<KyselyTyyppi | null>(null);
     const [vastaukset, setVastaukset] = useState<VastausTyyppi[]>([]);
+    const [kyselyLoading, setKyselyLoading] = useState(true);
+    const [vastauksetLoading, setVastauksetLoading] = useState(true);
+    const [kyselyError, setKyselyError] = useState<string | null>(null);
+    const [vastauksetError, setVastauksetError] = useState<string | null>(null);
 
     useEffect(() => {
         if (id) {
@@ -17,39 +21,63 @@ export default function Tulosraportti() {
     }, [id]);
 
     const fetchKysely = (id: string) => {
+        setKyselyLoading(true);
+        setKyselyError(null);
         fetch(`http://127.0.0.1:8080/api/kyselyt/${id}`) // lokaalisti testatessa
             // fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}`) // rahtiversio
             .then((vastaus) => {
                 if (!vastaus.ok) {
-                    throw new Error("Virhe hakiessa kyselyä: " + vastaus.statusText);
+                    throw new Error("Virhe hakiessa kyselyä: " + vastaus.status + " " + vastaus.statusText);
                 }
                 return vastaus.json();
             })
             .then((data) => {
                 setKysely(data);
             })
-            .catch((virhe) => console.error(virhe));
+            .catch((virhe) => {
+                console.error(virhe);
+                const msg = virhe instanceof Error ? virhe.message : String(virhe);
+                setKyselyError(msg);
+            })
+            .finally(() => setKyselyLoading(false));
     };
 
     const fetchVastaukset = (id: string) => {
+        setVastauksetLoading(true);
+        setVastauksetError(null);
         fetch(`http://127.0.0.1:8080/api/kyselyt/${id}/vastaukset`) // lokaalisti testatessa
             // fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}/vastaukset`) // rahtiversio
             .then((vastaus) => {
                 if (!vastaus.ok) {
-                    throw new Error("Virhe hakiessa vastauksia: " + vastaus.statusText);
+                    // don't throw hard — handle 404 or missing endpoint gracefully
+                    throw new Error("Virhe hakiessa vastauksia: " + vastaus.status + " " + vastaus.statusText);
                 }
                 return vastaus.json();
             })
             .then((data) => {
                 setVastaukset(data);
             })
-            .catch((virhe) => console.error(virhe));
+            .catch((virhe) => {
+                console.error(virhe);
+                const msg = virhe instanceof Error ? virhe.message : String(virhe);
+                setVastauksetError(msg);
+                setVastaukset([]); // ensure UI still renders
+            })
+            .finally(() => setVastauksetLoading(false));
     };
+
+    if (kyselyLoading) {
+        return (
+            <div style={{ width: "85%", margin: "auto", paddingTop: 20, textAlign: "center" }}>
+                <h3>Ladataan kyselyä…</h3>
+            </div>
+        );
+    }
 
     if (!kysely) {
         return (
             <div style={{
-                width: "50%",
+                width: "85%",
                 margin: "auto",
                 paddingTop: 10,
                 display: "flex",
@@ -64,7 +92,7 @@ export default function Tulosraportti() {
 
     return (
         <div style={{
-            width: "50%",
+            width: "85%",
             margin: "auto",
             paddingTop: 20,
             display: "flex",
@@ -87,27 +115,32 @@ export default function Tulosraportti() {
 
             <h2>Kyselyn <b>{kysely.nimi}</b> tulosraportti</h2>
 
-            {kysely.kysymykset && kysely.kysymykset.length > 0 ? (
-                kysely.kysymykset.map((k, index) => (
-                    <div key={k.kysymys_id}>
-                        <p>
-                            <b>Kysymys {index + 1}:</b> {k.kysymysteksti}
-                        </p>
+            {kyselyError && <div style={{ color: "#b00020" }}>Kyselyn latauksessa virhe: {kyselyError}</div>}
+            {vastauksetError && <div style={{ color: "#b00020" }}>Vastauksia ei voitu ladata: {vastauksetError}</div>}
 
-                        {vastaukset.length > 0 ? (
-                            <ul>
-                                {vastaukset
-                                    .filter(v => v.kysymys_id === k.kysymys_id)
-                                    .map((vastaus, vIndex) => (
+            {kysely.kysymykset && kysely.kysymykset.length > 0 ? (
+                kysely.kysymykset.map((k, index) => {
+                    const filtered = vastaukset.filter(v => v.kysymys_id === k.kysymys_id);
+                    return (
+                        <div key={k.kysymys_id}>
+                            <p>
+                                <b>Kysymys {index + 1}:</b> {k.kysymysteksti}
+                            </p>
+
+                            {vastauksetLoading ? (
+                                <p>Ladataan vastauksia…</p>
+                            ) : filtered.length > 0 ? (
+                                <ul>
+                                    {filtered.map((vastaus, vIndex) => (
                                         <li key={vIndex}>{vastaus.vastausteksti}</li>
                                     ))}
-                            </ul>
-                        ) : (
-                            <p>Ei vastauksia tähän kysymykseen.</p>
-                        )}
-
-                    </div>
-                ))
+                                </ul>
+                            ) : (
+                                <p>Ei vastauksia tähän kysymykseen.</p>
+                            )}
+                        </div>
+                    );
+                })
             ) : (
                 <p>Kyselyssä ei ole kysymyksiä.</p>
             )}

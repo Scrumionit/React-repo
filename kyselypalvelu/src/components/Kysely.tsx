@@ -9,6 +9,8 @@ export default function UusiKysely() {
     const { id } = useParams<{ id: string }>();
     const [kysely, setKysely] = useState<KyselyTyyppi | null>(null);
     const [vastaukset, setVastaukset] = useState<Record<number, string>>({});
+    const [saving, setSaving] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -101,31 +103,39 @@ export default function UusiKysely() {
             )}
 
             <br />
-            <Button onClick={async () => {  // kokeiltu tallennusta mutta ei toimi vielä
+            {saveError && <div style={{ color: "#b00020" }}>Tallennus epäonnistui: {saveError}</div>}
+            <Button onClick={async () => {
                 if (!kysely) return;
-                const payload = {
-                    kysely_id: kysely.kysely_id,
-                    vastaukset: kysely.kysymykset.map((k) => ({
-                        kysymys_id: k.kysymys_id,
-                        vastausteksti: vastaukset[k.kysymys_id] ?? ""
-                    }))
-                };
+                setSaveError(null);
+                setSaving(true);
 
                 try {
-                    const resp = await fetch("http://127.0.0.1:8080/api/vastaukset", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(payload),
+                    // Send each answer to the per-question endpoint expected by backend
+                    const promises = kysely.kysymykset.map((k) => {
+                        const text = vastaukset[k.kysymys_id] ?? "";
+                        const url = `http://127.0.0.1:8080/api/kyselyt/${kysely.kysely_id}/kysymykset/${k.kysymys_id}/vastaukset`;
+                        return fetch(url, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ vastausteksti: text }),
+                        }).then((r) => {
+                            if (!r.ok) throw new Error(`Virhe ${r.status} kysymys ${k.kysymys_id}`);
+                            return r.json();
+                        });
                     });
-                    if (!resp.ok) throw new Error(`Palvelin palautti virheen: ${resp.status}`);
+
+                    await Promise.all(promises);
                     alert("Vastaukset tallennettu.");
                     navigate("/kyselyt");
-                } catch (err) {
+                } catch (err: unknown) {
                     console.error(err);
-                    alert("Vastauksien tallennus epäonnistui. Katso konsoli.");
+                    const msg = err instanceof Error ? err.message : String(err);
+                    setSaveError(msg || "Tuntematon virhe");
+                } finally {
+                    setSaving(false);
                 }
-            }} variant="contained" sx={{ backgroundColor: "#18b89e", marginTop: 2, marginBottom: 5 }}>
-                Tallenna vastaukset
+            }} variant="contained" sx={{ backgroundColor: "#18b89e", marginTop: 2, marginBottom: 5 }} disabled={saving}>
+                {saving ? "Tallennetaan…" : "Tallenna vastaukset"}
             </Button>
 
         </div>
