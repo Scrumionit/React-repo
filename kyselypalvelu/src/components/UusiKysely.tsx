@@ -271,7 +271,7 @@ export default function UusiKysely() {
               }
             }
 
-            alert("Kysely ja kysymykset tallennettu");
+            alert("Kysely ja kysymykset tallennettu onnistuneesti!");
             navigate("/kyselyt");
           } catch (err) {
             console.error(err);

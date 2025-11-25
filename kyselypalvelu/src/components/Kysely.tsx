@@ -136,7 +136,7 @@ export default function UusiKysely() {
                     });
 
                     await Promise.all(promises);
-                    alert("Vastaukset tallennettu.");
+                    alert("Vastaukset tallennettu onnistuneesti! Kiitos osallistumisestasi.");
                     navigate("/kyselyt");
                 } catch (err: unknown) {
                     console.error(err);
