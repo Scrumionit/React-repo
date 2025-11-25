@@ -1,19 +1,35 @@
-export type KysymysTyyppi = {
+export type Kysymys = {
   kysymys_id: number;
-  kysymystyyppi: string;
+  kysymystyyppi: KysymysTyyppi;
   kysymysteksti: string;
-  vastaus: string[];
+  vaihtoehdot: string[];
+  vastaukset: string[];
 };
 
-export type KyselyTyyppi = {
+export type Kysely = {
   kysely_id: number;
   nimi: string;
   kuvaus: string;
-  kysymykset: KysymysTyyppi[];
+  alkupvm: string;
+  loppupvm: string;
+  kysymykset: Kysymys[];
 };
 
-export type VastausTyyppi = {
+export type Vastaus = {
   vastaus_id: number;
   vastausteksti: string;
-  kysymys_id: number;
+  kysymys: Kysymys; //monta vastausta voi liittyä yhteen kysymykseen
+  vaihtoehto: Vaihtoehto; //valittu vaihtoehto, jos kysymystyyppi on monivalinta
+};
+
+export type KysymysTyyppi = {
+  kysymystyyppi_id: number;
+  nimi: string;
+  kysymykset: Kysymys[];
+};
+
+export type Vaihtoehto = {
+  vaihtoehto_id: number;
+  teksti: string;
+  kysymys: Kysymys;
 };

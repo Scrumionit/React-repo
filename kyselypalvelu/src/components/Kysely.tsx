@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { KyselyTyyppi } from "../types";
+import type { Kysely } from "../types";
 import { Button, IconButton, TextField } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 
 export default function UusiKysely() {
     const { id } = useParams<{ id: string }>();
-    const [kysely, setKysely] = useState<KyselyTyyppi | null>(null);
+    const [kysely, setKysely] = useState<Kysely | null>(null);
     const [vastaukset, setVastaukset] = useState<Record<number, string>>({});
     const [saving, setSaving] = useState(false);
     const [saveError, setSaveError] = useState<string | null>(null);
@@ -88,27 +88,31 @@ export default function UusiKysely() {
             <h3>{kysely.kuvaus}</h3>
 
             {kysely.kysymykset && kysely.kysymykset.length > 0 ? (
-                kysely.kysymykset.map((k, index) => (
-                    <div key={k.kysymys_id}>
-                        <p>
-                            <b>Kysymys {index + 1}:</b> {k.kysymysteksti}
-                        </p>
-                        <TextField
-                            label="Anna vastaus"
-                            multiline
-                            rows={3}
-                            variant="outlined"
-                            fullWidth
-                            value={vastaukset[k.kysymys_id] ?? ""}
-                            onChange={(e) =>
-                                setVastaukset((prev) => ({
-                                    ...prev,
-                                    [k.kysymys_id]: e.target.value,
-                                }))
-                            }
-                        />
-                    </div>
-                ))
+                // Sort by kysymys_id to ensure stable, original save order
+                ([...kysely.kysymykset] as typeof kysely.kysymykset)
+                    .slice()
+                    .sort((a, b) => (a.kysymys_id ?? 0) - (b.kysymys_id ?? 0))
+                    .map((k, index) => (
+                        <div key={k.kysymys_id}>
+                            <p>
+                                <b>Kysymys {index + 1}:</b> {k.kysymysteksti}
+                            </p>
+                            <TextField
+                                label="Anna vastaus"
+                                multiline
+                                rows={3}
+                                variant="outlined"
+                                fullWidth
+                                value={vastaukset[k.kysymys_id] ?? ""}
+                                onChange={(e) =>
+                                    setVastaukset((prev) => ({
+                                        ...prev,
+                                        [k.kysymys_id]: e.target.value,
+                                    }))
+                                }
+                            />
+                        </div>
+                    ))
             ) : (
                 <p><i>Ei kysymyksiä tässä kyselyssä.</i></p>
             )}
@@ -128,7 +132,11 @@ export default function UusiKysely() {
                         return fetch(url, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ vastausteksti: text }),
+                            body: JSON.stringify({
+                                vastausteksti: text,
+                                kysymys_id: k.kysymys_id,
+                                kysely_id: kysely.kysely_id,
+                            }),
                         }).then((r) => {
                             if (!r.ok) throw new Error(`Virhe ${r.status} kysymys ${k.kysymys_id}`);
                             return r.json();

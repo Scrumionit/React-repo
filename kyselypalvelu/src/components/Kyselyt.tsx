@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import type { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import Button from "@mui/material/Button";
-import type { KyselyTyyppi } from "../types";
+import type { Kysely } from "../types";
 import { Link, NavLink } from "react-router-dom";
 
 export default function Kyselylista() {
-  const [kyselyt, setKyselyt] = useState<KyselyTyyppi[]>([]);
+  const [kyselyt, setKyselyt] = useState<Kysely[]>([]);
 
   useEffect(() => {
     fetchKyselyt();

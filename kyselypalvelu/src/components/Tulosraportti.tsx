@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import type { KyselyTyyppi, VastausTyyppi } from "../types";
+import type { Kysely, Vastaus } from "../types";
 import { NavLink, useParams } from "react-router-dom";
 import { Button, IconButton } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export default function Tulosraportti() {
     const { id } = useParams<{ id: string }>();
-    const [kysely, setKysely] = useState<KyselyTyyppi | null>(null);
-    const [vastaukset, setVastaukset] = useState<VastausTyyppi[]>([]);
+    const [kysely, setKysely] = useState<Kysely | null>(null);
+    const [vastaukset, setVastaukset] = useState<Vastaus[]>([]);
     const [kyselyLoading, setKyselyLoading] = useState(true);
     const [vastauksetLoading, setVastauksetLoading] = useState(true);
     const [kyselyError, setKyselyError] = useState<string | null>(null);
@@ -55,7 +55,9 @@ export default function Tulosraportti() {
                 return vastaus.json();
             })
             .then((data) => {
-                setVastaukset(data);
+                console.debug("Raw fetched vastaukset:", data);
+                // save as-is; rendering will read either `kysymys_id` or nested `kysymys`
+                setVastaukset(data as Vastaus[]);
             })
             .catch((virhe) => {
                 console.error(virhe);
@@ -119,28 +121,52 @@ export default function Tulosraportti() {
             {vastauksetError && <div style={{ color: "#b00020" }}>Vastauksia ei voitu ladata: {vastauksetError}</div>}
 
             {kysely.kysymykset && kysely.kysymykset.length > 0 ? (
-                kysely.kysymykset.map((k, index) => {
-                    const filtered = vastaukset.filter(v => v.kysymys_id === k.kysymys_id);
-                    return (
-                        <div key={k.kysymys_id}>
-                            <p>
-                                <b>Kysymys {index + 1}:</b> {k.kysymysteksti}
-                            </p>
+                // sort questions by id to ensure stable order
+                ([...kysely.kysymykset] as typeof kysely.kysymykset)
+                    .slice()
+                    .sort((a, b) => (a.kysymys_id ?? 0) - (b.kysymys_id ?? 0))
+                    .map((k, index) => {
+                        // filter answers: backend may return either kysymys_id or nested kysymys object
+                        const filtered = vastaukset
+                            .filter((v) => {
+                                const asObj = v as unknown as Record<string, unknown>;
+                                const kysIdRaw = asObj["kysymys_id"] ?? (asObj["kysymys"] as Record<string, unknown> | undefined)?.["kysymys_id"] ?? (asObj["kysymys"] as Record<string, unknown> | undefined)?.["id"];
+                                let qid: number | null = null;
+                                if (typeof kysIdRaw === "number") qid = kysIdRaw;
+                                else if (typeof kysIdRaw === "string" && /^\d+$/.test(kysIdRaw)) qid = Number(kysIdRaw);
+                                return qid === k.kysymys_id;
+                            })
+                            .slice()
+                            .sort((a, b) => {
+                                const aaRaw = (a as unknown as Record<string, unknown>)["vastaus_id"];
+                                const bbRaw = (b as unknown as Record<string, unknown>)["vastaus_id"];
+                                const aa = typeof aaRaw === "number" ? aaRaw : (typeof aaRaw === "string" && /^\d+$/.test(aaRaw) ? Number(aaRaw) : 0);
+                                const bb = typeof bbRaw === "number" ? bbRaw : (typeof bbRaw === "string" && /^\d+$/.test(bbRaw) ? Number(bbRaw) : 0);
+                                return aa - bb;
+                            });
 
-                            {vastauksetLoading ? (
-                                <p>Ladataan vastauksia…</p>
-                            ) : filtered.length > 0 ? (
-                                <ul>
-                                    {filtered.map((vastaus, vIndex) => (
-                                        <li key={vIndex}>{vastaus.vastausteksti}</li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p>Ei vastauksia tähän kysymykseen.</p>
-                            )}
-                        </div>
-                    );
-                })
+                        return (
+                            <div key={k.kysymys_id}>
+                                <p>
+                                    <b>Kysymys {index + 1}:</b> {k.kysymysteksti}
+                                </p>
+
+                                {vastauksetLoading ? (
+                                    <p>Ladataan vastauksia…</p>
+                                ) : filtered.length > 0 ? (
+                                    <ul>
+                                        {filtered.map((vastaus, vIndex) => {
+                                            const o = vastaus as unknown as Record<string, unknown>;
+                                            const text = typeof o["vastausteksti"] === "string" ? o["vastausteksti"] as string : (typeof o["teksti"] === "string" ? o["teksti"] as string : String(o["vastausteksti"] ?? ""));
+                                            return (<li key={vIndex}>{text}</li>);
+                                        })}
+                                    </ul>
+                                ) : (
+                                    <p>Ei vastauksia tähän kysymykseen.</p>
+                                )}
+                            </div>
+                        );
+                    })
             ) : (
                 <p>Kyselyssä ei ole kysymyksiä.</p>
             )}
