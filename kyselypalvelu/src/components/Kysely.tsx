@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { Kysely } from "../types";
-import { Button, IconButton, TextField } from "@mui/material";
+import { Button, IconButton, TextField, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
@@ -23,7 +23,7 @@ export default function UusiKysely() {
     const fetchKysely = (id: string) => {
         setKyselyLoading(true);
         fetch(`http://127.0.0.1:8080/api/kyselyt/${id}`) // lokaalisti testatessa
-        // fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}`) // rahtiversio
+            // fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}`) // rahtiversio
             .then((vastaus) => {
                 if (!vastaus.ok) {
                     throw new Error("Virhe hakiessa kyselyä: " + vastaus.statusText);
@@ -37,7 +37,7 @@ export default function UusiKysely() {
             .finally(() => setKyselyLoading(false));
     };
 
-  if (kyselyLoading) {
+    if (kyselyLoading) {
         return (
             <div style={{ width: "50%", margin: "auto", paddingTop: 20, textAlign: "center" }}>
                 <h3>Ladataan kyselyä…</h3>
@@ -97,20 +97,54 @@ export default function UusiKysely() {
                             <p>
                                 <b>Kysymys {index + 1}:</b> {k.kysymysteksti}
                             </p>
-                            <TextField
-                                label="Anna vastaus"
-                                multiline
-                                rows={3}
-                                variant="outlined"
-                                fullWidth
-                                value={vastaukset[k.kysymys_id] ?? ""}
-                                onChange={(e) =>
-                                    setVastaukset((prev) => ({
-                                        ...prev,
-                                        [k.kysymys_id]: e.target.value,
-                                    }))
-                                }
-                            />
+
+                            {k.vaihtoehdot && k.vaihtoehdot.length > 0 ? (
+                                (() => {
+                                    const options = k.vaihtoehdot.map((opt) => {
+                                        if (opt == null) return { teksti: "" };
+                                        return typeof opt === "string" ? { teksti: opt } : opt;
+                                    });
+
+                                    return (
+                                        <FormControl component="fieldset" sx={{ marginTop: 1, marginBottom: 1 }}>
+                                            <FormLabel component="legend">Valitse vaihtoehto</FormLabel>
+                                            <RadioGroup
+                                                value={vastaukset[k.kysymys_id] ?? ""}
+                                                onChange={(e) =>
+                                                    setVastaukset((prev) => ({
+                                                        ...prev,
+                                                        [k.kysymys_id]: e.target.value,
+                                                    }))
+                                                }
+                                            >
+                                                {options.map((option, index) => (
+                                                    <FormControlLabel
+                                                        key={index}
+                                                        value={option.teksti}
+                                                        control={<Radio />}
+                                                        label={option.teksti}
+                                                    />
+                                                ))}
+                                            </RadioGroup>
+                                        </FormControl>
+                                    );
+                                })()
+                            ) : (
+                                <TextField
+                                    label="Anna vastaus"
+                                    multiline
+                                    rows={3}
+                                    variant="outlined"
+                                    fullWidth
+                                    value={vastaukset[k.kysymys_id] ?? ""}
+                                    onChange={(e) =>
+                                        setVastaukset((prev) => ({
+                                            ...prev,
+                                            [k.kysymys_id]: e.target.value,
+                                        }))
+                                    }
+                                />
+                            )}
                         </div>
                     ))
             ) : (
