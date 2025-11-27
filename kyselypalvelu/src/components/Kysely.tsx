@@ -22,8 +22,8 @@ export default function UusiKysely() {
 
     const fetchKysely = (id: string) => {
         setKyselyLoading(true);
-        // fetch(`http://127.0.0.1:8080/api/kyselyt/${id}`) // lokaalisti testatessa
-        fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}`) // rahtiversio
+        fetch(`http://127.0.0.1:8080/api/kyselyt/${id}`) // lokaalisti testatessa
+        // fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}`) // rahtiversio
             .then((vastaus) => {
                 if (!vastaus.ok) {
                     throw new Error("Virhe hakiessa kyselyä: " + vastaus.statusText);
@@ -162,8 +162,8 @@ export default function UusiKysely() {
                     // Send each answer to the per-question endpoint expected by backend
                     const promises = kysely.kysymykset.map((k) => {
                         const text = vastaukset[k.kysymys_id] ?? "";
-                        // const url = `http://127.0.0.1:8080/api/kyselyt/${kysely.kysely_id}/kysymykset/${k.kysymys_id}/vastaukset`; // lokaalisti testatessa
-                        const url = `https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${kysely.kysely_id}/kysymykset/${k.kysymys_id}/vastaukset`; // rahtiversio
+                        const url = `http://127.0.0.1:8080/api/kyselyt/${kysely.kysely_id}/kysymykset/${k.kysymys_id}/vastaukset`; // lokaalisti testatessa
+                        // const url = `https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${kysely.kysely_id}/kysymykset/${k.kysymys_id}/vastaukset`; // rahtiversio
                         return fetch(url, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },

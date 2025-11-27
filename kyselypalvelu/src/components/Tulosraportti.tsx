@@ -45,8 +45,8 @@ export default function Tulosraportti() {
     const fetchVastaukset = (id: string) => {
         setVastauksetLoading(true);
         setVastauksetError(null);
-        // fetch(`http://127.0.0.1:8080/api/kyselyt/${id}/vastaukset`) // lokaalisti testatessa
-            fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}/vastaukset`) // rahtiversio
+        fetch(`http://127.0.0.1:8080/api/kyselyt/${id}/vastaukset`) // lokaalisti testatessa
+        // fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}/vastaukset`) // rahtiversio
             .then((vastaus) => {
                 if (!vastaus.ok) {
                     // don't throw hard — handle 404 or missing endpoint gracefully
@@ -162,7 +162,7 @@ export default function Tulosraportti() {
                                         })}
                                     </ul>
                                 ) : (
-                                    <p>Ei vastauksia tähän kysymykseen.</p>
+                                    <p><i>Ei vastauksia tähän kysymykseen.</i></p>
                                 )}
                             </div>
                         );
