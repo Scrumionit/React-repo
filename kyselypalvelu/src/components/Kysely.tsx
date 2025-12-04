@@ -64,6 +64,19 @@ export default function Kysely() {
         );
     }
 
+
+      {/*Tarkistetaan onko monivalintakysymys vai avoin kysymys */}
+      const onMonivalinta = (k:any) =>{
+        if (k?.kysymysTyyppi != null) {
+            const t = String(k.kysymysTyyppi).toLowerCase();
+            return( t === "monivalinta" || t === "multiplechoice" || t.includes("monival") || t.includes("multiple") || t.includes("choice") || t.includes("valinta")
+        );
+        }
+        //jos tyyppiä ei ole määritelty, tarkistetaan onko vaihtoehtoja
+        return !!(k?.vaihtoehdot && k.vaihtoehdot.length > 0);
+        };
+      
+
     // Näyttää varsinaisen kyselyn ja vastauslomakkeen
     return (
         <div style={{
@@ -106,56 +119,57 @@ export default function Kysely() {
                                 <b>Kysymys {index + 1}:</b> {k.kysymysteksti}
                             </p>
 
-                            {/* Jos vaihtoehtoja on, näytä ne radiopainikkeina */}
-                            {k.vaihtoehdot && k.vaihtoehdot.length > 0 ? (
-                                (() => {
-                                    const options = k.vaihtoehdot.map((opt) => {
-                                        if (opt == null) return { teksti: "" };
-                                        return typeof opt === "string" ? { teksti: opt } : opt;
-                                    });
-
-                                    {/* Palauttaa radiopainikeryhmän vaihtoehdoille */}
-                                    return (
-                                        <FormControl component="fieldset" sx={{ marginTop: 1, marginBottom: 1 }}>
-                                            <FormLabel component="legend">Valitse vaihtoehto</FormLabel>
-                                            <RadioGroup
-                                                value={vastaukset[k.kysymys_id] ?? ""}
-                                                onChange={(e) =>
-                                                    setVastaukset((prev) => ({
-                                                        ...prev,
-                                                        [k.kysymys_id]: e.target.value,
-                                                    }))
-                                                }
-                                            >
-                                                {options.map((option, index) => (
-                                                    <FormControlLabel
-                                                        key={index}
-                                                        value={option.teksti}
-                                                        control={<Radio />}
-                                                        label={option.teksti}
-                                                    />
-                                                ))}
-                                            </RadioGroup>
-                                        </FormControl>
-                                    );
-                                })()
-                            ) : (
+                 {/* Näytetään vastausvaihtoehdot, jos kysymystyyppinä monivalinta */}
+                {onMonivalinta(k) ? (
+                    <>
+                        {(() => {
+                            const vaihtoehdot = (k.vaihtoehdot ?? []).map((ve: any) => {
+                                if (ve == null) return { teksti: "" };
+                                return typeof ve === "string" ? { teksti: ve } : ve;
+                            });
+                        {/*Palauttaa radiobutton monivalintakysymyksille*/}
+                      return (
+                                <FormControl component="fieldset" sx={{ marginTop: 1, marginBottom: 1 }}>
+                                    <FormLabel component="legend">Valitse yksi vaihtoehto:</FormLabel>
+                                    <RadioGroup
+                                        value={vastaukset[k.kysymys_id] ?? ""}
+                                        onChange={(e) =>
+                                            setVastaukset((prev) => ({
+                                                ...prev,
+                                                [k.kysymys_id]: e.target.value,
+                                            }))
+                                        }
+                                    >
+                                        {vaihtoehdot.map((ve, veIndex) => (
+                                            <FormControlLabel
+                                                key={veIndex}
+                                                value={ve.teksti}
+                                                control={<Radio />}
+                                                label={ve.teksti}
+                                            />
+                                        ))}
+                                    </RadioGroup>
+                                </FormControl>
+                              );
+                        })()}
+                    </>
+                ) : (   
                                 // Muuten (jos ei vaihtoehtoja) näytetään monirivinen tekstikenttä avoimelle vastaukselle
-                                <TextField
-                                    label="Anna vastaus"
-                                    multiline
-                                    rows={3}
-                                    variant="outlined"
-                                    fullWidth
-                                    value={vastaukset[k.kysymys_id] ?? ""}
-                                    onChange={(e) =>
-                                        setVastaukset((prev) => ({
-                                            ...prev,
-                                            [k.kysymys_id]: e.target.value,
-                                        }))
-                                    }
-                                />
-                            )}
+                               <TextField
+                        label="Anna vastaus"
+                        multiline
+                        rows={3}
+                        variant="outlined"
+                        fullWidth
+                        value={vastaukset[k.kysymys_id] ?? ""}
+                        onChange={(e) =>
+                            setVastaukset((prev) => ({
+                                ...prev,
+                                [k.kysymys_id]: e.target.value,
+                            }))
+                        }
+                    />
+                )}
                         </div>
                     ))
             ) : (
