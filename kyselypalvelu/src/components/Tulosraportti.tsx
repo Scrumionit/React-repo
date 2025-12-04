@@ -20,6 +20,7 @@ export default function Tulosraportti() {
         }
     }, [id]);
 
+    // Hakee yksittäisen kyselyn backendistä
     const fetchKysely = (id: string) => {
         setKyselyLoading(true);
         setKyselyError(null);
@@ -42,6 +43,7 @@ export default function Tulosraportti() {
             .finally(() => setKyselyLoading(false));
     };
 
+    // Hakee vastaukset kyseiselle kyselylle backendistä
     const fetchVastaukset = (id: string) => {
         setVastauksetLoading(true);
         setVastauksetError(null);
@@ -68,6 +70,7 @@ export default function Tulosraportti() {
             .finally(() => setVastauksetLoading(false));
     };
 
+    // Näyttää latausilmoituksen, kun kyselyä haetaan
     if (kyselyLoading) {
         return (
             <div style={{ width: "50%", margin: "auto", paddingTop: 20, textAlign: "center" }}>
@@ -76,6 +79,7 @@ export default function Tulosraportti() {
         );
     }
 
+    // Näyttää virheilmoituksen, jos kyselyä ei löydy
     if (!kysely) {
         return (
             <div style={{
@@ -92,6 +96,7 @@ export default function Tulosraportti() {
         );
     }
 
+    // Näyttää varsinaisen tulosraportin
     return (
         <div style={{
             width: "70%",
@@ -101,6 +106,7 @@ export default function Tulosraportti() {
             flexDirection: "column",
             gap: 10
         }}>
+            {/* Takaisin kyselylistaukseen -painike */}
             <IconButton
                 component={NavLink}
                 to="/kyselyt"
@@ -115,18 +121,21 @@ export default function Tulosraportti() {
                 <ArrowBackIcon />
             </IconButton>
 
+            {/* Kyselyn nimi ja tulosraportin otsikko */}
             <h2>Kyselyn "<b>{kysely.nimi}</b>" tulosraportti</h2>
 
+            {/* Näyttää mahdolliset virheilmoitukset */}
             {kyselyError && <div style={{ color: "#b00020" }}>Kyselyn latauksessa virhe: {kyselyError}</div>}
             {vastauksetError && <div style={{ color: "#b00020" }}>Vastauksia ei voitu ladata: {vastauksetError}</div>}
 
+            {/* Käy läpi kaikki kysymykset ja näyttää niihin liittyvät vastaukset */}
             {kysely.kysymykset && kysely.kysymykset.length > 0 ? (
-                // sort questions by id to ensure stable order
+                // Järjestää kysymykset kysymys_id:n mukaan jotta ne näkyisivät samassa järjestyksessä kuin kyselyssä
                 ([...kysely.kysymykset] as typeof kysely.kysymykset)
                     .slice()
                     .sort((a, b) => (a.kysymys_id ?? 0) - (b.kysymys_id ?? 0))
                     .map((k, index) => {
-                        // filter answers: backend may return either kysymys_id or nested kysymys object
+                        // suodattaa vastaukset: backend voi palauttaa joko kysymys_id:n tai sisäkkäisen kysymys-objektin
                         const filtered = vastaukset
                             .filter((v) => {
                                 const asObj = v as unknown as Record<string, unknown>;
@@ -145,6 +154,7 @@ export default function Tulosraportti() {
                                 return aa - bb;
                             });
 
+                        {/* Näyttää yksittäisen kysymyksen ja siihen liittyvät vastaukset */}
                         return (
                             <div key={k.kysymys_id}>
                                 <p>
@@ -168,6 +178,7 @@ export default function Tulosraportti() {
                         );
                     })
             ) : (
+                // Jos kyselyssä ei ole kysymyksiä
                 <p>Kyselyssä ei ole kysymyksiä.</p>
             )}
 
