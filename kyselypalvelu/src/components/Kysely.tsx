@@ -5,7 +5,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 
-export default function UusiKysely() {
+export default function Kysely() {
     const { id } = useParams<{ id: string }>();
     const [kysely, setKysely] = useState<Kysely | null>(null);
     const [vastaukset, setVastaukset] = useState<Record<number, string>>({});
@@ -20,10 +20,11 @@ export default function UusiKysely() {
         }
     }, [id]);
 
+    // Hakee yksittäisen kyselyn backendistä
     const fetchKysely = (id: string) => {
         setKyselyLoading(true);
         fetch(`http://127.0.0.1:8080/api/kyselyt/${id}`) // lokaalisti testatessa
-        // fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}`) // rahtiversio
+            // fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}`) // rahtiversio
             .then((vastaus) => {
                 if (!vastaus.ok) {
                     throw new Error("Virhe hakiessa kyselyä: " + vastaus.statusText);
@@ -37,6 +38,7 @@ export default function UusiKysely() {
             .finally(() => setKyselyLoading(false));
     };
 
+    // Näyttää latausilmoituksen, kun kyselyä haetaan
     if (kyselyLoading) {
         return (
             <div style={{ width: "50%", margin: "auto", paddingTop: 20, textAlign: "center" }}>
@@ -45,6 +47,7 @@ export default function UusiKysely() {
         );
     }
 
+    // Näyttää virheilmoituksen, jos kyselyä ei löydy
     if (!kysely) {
         return (
             <div style={{
@@ -61,6 +64,7 @@ export default function UusiKysely() {
         );
     }
 
+    // Näyttää varsinaisen kyselyn ja vastauslomakkeen
     return (
         <div style={{
             width: "50%",
@@ -70,6 +74,7 @@ export default function UusiKysely() {
             flexDirection: "column",
             gap: 10
         }}>
+            {/* Takaisin kyselylistaukseen -painike */}
             <IconButton
                 component={NavLink}
                 to="/kyselyt"
@@ -84,11 +89,14 @@ export default function UusiKysely() {
                 <ArrowBackIcon />
             </IconButton>
 
+            {/* Kyselyn nimi ja kuvaus */}
             <h2>{kysely.nimi}</h2>
             <h3>{kysely.kuvaus}</h3>
 
+
+            {/* Jos kysymyksiä on, käy ne läpi ja tulosta näkyviin */}
             {kysely.kysymykset && kysely.kysymykset.length > 0 ? (
-                // Sort by kysymys_id to ensure stable, original save order
+                // Lajitellaan kysymykset kysymys_id:n mukaan ja mapataan ne näkyviin jotta järjestys säilyy
                 ([...kysely.kysymykset] as typeof kysely.kysymykset)
                     .slice()
                     .sort((a, b) => (a.kysymys_id ?? 0) - (b.kysymys_id ?? 0))
@@ -98,6 +106,7 @@ export default function UusiKysely() {
                                 <b>Kysymys {index + 1}:</b> {k.kysymysteksti}
                             </p>
 
+                            {/* Jos vaihtoehtoja on, näytä ne radiopainikkeina */}
                             {k.vaihtoehdot && k.vaihtoehdot.length > 0 ? (
                                 (() => {
                                     const options = k.vaihtoehdot.map((opt) => {
@@ -105,6 +114,7 @@ export default function UusiKysely() {
                                         return typeof opt === "string" ? { teksti: opt } : opt;
                                     });
 
+                                    {/* Palauttaa radiopainikeryhmän vaihtoehdoille */}
                                     return (
                                         <FormControl component="fieldset" sx={{ marginTop: 1, marginBottom: 1 }}>
                                             <FormLabel component="legend">Valitse vaihtoehto</FormLabel>
@@ -130,6 +140,7 @@ export default function UusiKysely() {
                                     );
                                 })()
                             ) : (
+                                // Muuten (jos ei vaihtoehtoja) näytetään monirivinen tekstikenttä avoimelle vastaukselle
                                 <TextField
                                     label="Anna vastaus"
                                     multiline
@@ -148,18 +159,22 @@ export default function UusiKysely() {
                         </div>
                     ))
             ) : (
+                // Jos kyselyssä ei ole kysymyksiä
                 <p><i>Ei kysymyksiä tässä kyselyssä.</i></p>
             )}
 
+            {/* Tallennusvirheen näyttö */}
             <br />
             {saveError && <div style={{ color: "#b00020" }}>Tallennus epäonnistui: {saveError}</div>}
+
+            {/* Tallenna vastaukset -painike */}
             <Button onClick={async () => {
                 if (!kysely) return;
                 setSaveError(null);
                 setSaving(true);
 
                 try {
-                    // Send each answer to the per-question endpoint expected by backend
+                    {/* Lähetä jokainen vastaus erikseen */}
                     const promises = kysely.kysymykset.map((k) => {
                         const text = vastaukset[k.kysymys_id] ?? "";
                         const url = `http://127.0.0.1:8080/api/kyselyt/${kysely.kysely_id}/kysymykset/${k.kysymys_id}/vastaukset`; // lokaalisti testatessa
@@ -177,7 +192,7 @@ export default function UusiKysely() {
                             return r.json();
                         });
                     });
-
+                    {/* Odota, että kaikki vastaukset on lähetetty */}
                     await Promise.all(promises);
                     alert("Vastaukset tallennettu onnistuneesti! Kiitos osallistumisestasi.");
                     navigate("/kyselyt");
@@ -188,6 +203,7 @@ export default function UusiKysely() {
                 } finally {
                     setSaving(false);
                 }
+            {/* Napin tyylit, jos tallennus on käynnissä, nappi on disabled */}
             }} variant="contained" sx={{ backgroundColor: "#18b89e", marginTop: 2, marginBottom: 5 }} disabled={saving}>
                 {saving ? "Tallennetaan…" : "Tallenna vastaukset"}
             </Button>

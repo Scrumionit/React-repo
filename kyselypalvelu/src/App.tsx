@@ -6,14 +6,14 @@ import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { Box, Button } from '@mui/material'
-import type { KyselyTyyppi } from './types'
+import type { Kysely } from './types'
 import HHlogo from './assets/HHlogo.png'
 // import "./App.css"
 
 
 function App() {
-  const [kysely, setKysely] = useState<KyselyTyyppi[]>([]);
-  const [kyselyt, setKyselyt] = useState<KyselyTyyppi[]>([]);
+  const [kysely, setKysely] = useState<Kysely[]>([]);
+  const [kyselyt, setKyselyt] = useState<Kysely[]>([]);
 
   return (
     <Container maxWidth="xl">

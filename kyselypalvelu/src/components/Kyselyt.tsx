@@ -5,16 +5,17 @@ import Button from "@mui/material/Button";
 import type { Kysely } from "../types";
 import { Link, NavLink } from "react-router-dom";
 
-export default function Kyselylista() {
+export default function Kyselyt() {
   const [kyselyt, setKyselyt] = useState<Kysely[]>([]);
 
   useEffect(() => {
     fetchKyselyt();
   }, []);
 
+  // Hakee kaikki kyselyt backendistä
   const fetchKyselyt = () => {
     fetch("http://127.0.0.1:8080/api/kyselyt") // lokaalisti testatessa
-    // fetch("https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt") // rahtiversio
+      // fetch("https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt") // rahtiversio
       .then((vastaus) => {
         if (!vastaus.ok) {
           throw new Error("Virhe hakiessa kyselyjä: " + vastaus.statusText);
@@ -27,6 +28,7 @@ export default function Kyselylista() {
       .catch((virhe) => console.error(virhe));
   };
 
+  // Määrittelee sarakkeet DataGrid-komponentille
   const sarakkeet: GridColDef[] = [
     {
       field: "nimi",
@@ -56,6 +58,7 @@ export default function Kyselylista() {
       flex: 1,
     },
 
+    // Sarake, jossa on painike kyselyyn vastaamiseen
     {
       field: "vastaa",
       headerName: "",
@@ -80,6 +83,7 @@ export default function Kyselylista() {
       ),
     },
 
+    // Sarake, jossa on painike tulosraportin katsomiseen
     {
       field: "tulosraportti",
       headerName: "",
@@ -96,7 +100,7 @@ export default function Kyselylista() {
             to={`/tulosraportti/${params.row.kysely_id}`}
             variant="contained"
             size="small"
-            sx={{ backgroundColor: "#189bb8ff", marginLeft: 1, marginRight: 1}}
+            sx={{ backgroundColor: "#189bb8ff", marginLeft: 1, marginRight: 1 }}
           >
             Avaa raportti
           </Button>
@@ -105,6 +109,7 @@ export default function Kyselylista() {
     },
   ];
 
+  // Renderöi DataGrid-komponentin kyselyillä sekä "Luo uusi kysely" -painikkeen
   return (
     <>
       <div style={{ height: 600, width: "85%", margin: "auto", textAlign: "center" }}>
@@ -115,6 +120,7 @@ export default function Kyselylista() {
 
         <DataGrid rows={kyselyt} columns={sarakkeet} getRowId={(row) => row.kysely_id} getRowHeight={() => 'auto'} rowSelection={false}
           sx={{
+            // Tekstin rivittäminen soluihin jotta pitkät kuvaukset näkyvät kokonaan
             '& .MuiDataGrid-cell': {
               whiteSpace: 'normal',
               wordWrap: 'break-word',
