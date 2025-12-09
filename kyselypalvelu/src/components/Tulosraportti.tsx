@@ -24,7 +24,8 @@ export default function Tulosraportti() {
     const fetchKysely = (id: string) => {
         setKyselyLoading(true);
         setKyselyError(null);
-        fetch(`http://127.0.0.1:8080/api/kyselyt/${id}`) // lokaalisti testatessa
+         fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}`)
+       // fetch(`http://127.0.0.1:8080/api/kyselyt/${id}`) // lokaalisti testatessa
         // fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}`) // rahtiversio
             .then((vastaus) => {
                 if (!vastaus.ok) {
@@ -47,7 +48,8 @@ export default function Tulosraportti() {
     const fetchVastaukset = (id: string) => {
         setVastauksetLoading(true);
         setVastauksetError(null);
-        fetch(`http://127.0.0.1:8080/api/kyselyt/${id}/vastaukset`) // lokaalisti testatessa
+        fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}/vastaukset`)
+        //fetch(`http://127.0.0.1:8080/api/kyselyt/${id}/vastaukset`) // lokaalisti testatessa
         // fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}/vastaukset`) // rahtiversio
             .then((vastaus) => {
                 if (!vastaus.ok) {
