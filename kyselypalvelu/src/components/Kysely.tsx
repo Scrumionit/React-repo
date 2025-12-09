@@ -23,7 +23,8 @@ export default function Kysely() {
     // Hakee yksittäisen kyselyn backendistä
     const fetchKysely = (id: string) => {
         setKyselyLoading(true);
-        fetch(`http://127.0.0.1:8080/api/kyselyt/${id}`) // lokaalisti testatessa
+        fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}`)
+        //fetch(`http://127.0.0.1:8080/api/kyselyt/${id}`) // lokaalisti testatessa
             // fetch(`https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${id}`) // rahtiversio
             .then((vastaus) => {
                 if (!vastaus.ok) {
