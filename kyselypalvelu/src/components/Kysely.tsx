@@ -192,7 +192,8 @@ export default function Kysely() {
                     {/* Lähetä jokainen vastaus erikseen */}
                     const promises = kysely.kysymykset.map((k) => {
                         const text = vastaukset[k.kysymys_id] ?? "";
-                        const url = `http://127.0.0.1:8080/api/kyselyt/${kysely.kysely_id}/kysymykset/${k.kysymys_id}/vastaukset`; // lokaalisti testatessa
+                        const url = `https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${kysely.kysely_id}/kysymykset/${k.kysymys_id}/vastaukset`; // rahtiversio
+                       // const url = `http://127.0.0.1:8080/api/kyselyt/${kysely.kysely_id}/kysymykset/${k.kysymys_id}/vastaukset`; // lokaalisti testatessa
                         // const url = `https://spring-repo-scrumionit-kyselypalvelu.2.rahtiapp.fi/api/kyselyt/${kysely.kysely_id}/kysymykset/${k.kysymys_id}/vastaukset`; // rahtiversio
                         return fetch(url, {
                             method: "POST",
